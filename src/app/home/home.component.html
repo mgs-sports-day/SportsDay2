@@ -1,0 +1,73 @@
+<h1>MGS Sports Day 2019</h1>
+
+<p>Lorem ipsum informative text.</p>
+
+<mat-tab-group>
+    <mat-tab label="All forms">
+
+        <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="forms">
+                <ng-container matColumnDef="position">
+                    <th mat-header-cell *matHeaderCellDef>School position</th>
+
+                    <td mat-cell *matCellDef="let element">
+                        {{ forms.indexOf(element) + 1 }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="form">
+                    <th mat-header-cell *matHeaderCellDef>Form</th>
+
+                    <td mat-cell *matCellDef="let element">
+                        <strong>{{ element.year }}{{ element.name }}</strong>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="total">
+                    <th mat-header-cell *matHeaderCellDef>Total points</th>
+
+                    <td mat-cell *matCellDef="let element">
+                        {{ element.totalPoints }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef></th>
+
+                    <td mat-cell *matCellDef="let element">
+                        <a mat-button color="primary" [routerLink]="'/forms/' + element.id">
+                            More
+                        </a>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['position', 'form', 'total', 'action']"></tr>
+                <tr mat-row
+                    *matRowDef="let row; columns: ['position', 'form', 'total', 'action']"
+                    [ngClass]="'table-position-' + forms.indexOf(row)"
+                ></tr>
+            </table>
+        </div>
+
+
+    </mat-tab>
+
+    <mat-tab label="All events">
+
+        <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="events">
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+
+                    <td mat-cell *matCellDef="let element" matRipple matRippleColor="primary" [routerLink]="'/events/' + element.id">
+                        {{ element.name }}
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['name']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['name']"></tr>
+            </table>
+        </div>
+
+    </mat-tab>
+</mat-tab-group>
