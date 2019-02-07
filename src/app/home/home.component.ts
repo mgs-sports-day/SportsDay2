@@ -26,19 +26,11 @@ export class HomeComponent implements OnInit {
         this.formDetailService.getForms()
             .subscribe((data: [Form]) => {
 
-                data.forEach(e => {
-                    const scoreArray = e.scores.map(i => i.score);
-
-                    if (scoreArray.length > 0){
-                        e.totalPoints = scoreArray.reduce((total, next) => {
-                            return total + next;
-                        });
-                    } else {
-                        e.totalPoints = 0;
-                    }
-                });
-
                 this.forms = [...data];
+
+                this.forms = this.forms.sort((a, b) => {
+                    return b.total_points - a.total_points;
+                });
             });
     }
 

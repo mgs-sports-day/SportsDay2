@@ -5,7 +5,9 @@ export interface Form {
     name: string;
     year: number;
     scores: Score[];
-    totalPoints: number;
+    total_points: number;
+    rank: number;
+    year_rank: number;
 }
 
 export interface Score {
@@ -13,6 +15,7 @@ export interface Score {
     event_id: number;
     score: number;
     competitor: string;
+    event: Event;
 }
 
 @Injectable({
@@ -24,6 +27,10 @@ export class FormDetailService {
 
     constructor(private http: HttpClient) {
         this.rootUrl = localStorage.getItem('rootUrl');
+    }
+
+    getForm(id) {
+        return this.http.get<Form>(this.rootUrl + '/forms/' + id);
     }
 
     getForms() {

@@ -12,7 +12,8 @@ import { FormDetailComponent } from './form-detail/form-detail.component';
 
 const appRoutes: Routes = [
     { path: '', component: HomeComponent },
-    { path: 'events', component: EventDetailComponent }
+    { path: 'events', component: EventDetailComponent },
+    { path: 'forms/:id', component: FormDetailComponent }
 ];
 
 @NgModule({
