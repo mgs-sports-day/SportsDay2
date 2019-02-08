@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, isDevMode, OnInit} from '@angular/core';
 
 @Component({
     selector: 'app-root',
@@ -28,7 +28,11 @@ export class AppComponent implements OnInit {
             }
         ];
 
-        localStorage.setItem('rootUrl', 'http://localhost:3000');
+        if (isDevMode()) {
+            localStorage.setItem('rootUrl', 'http://localhost:3000');
+        } else {
+            localStorage.setItem('rootUrl', 'http://palkerecs.com:3000');
+        }
     }
 
     @HostListener('window:resize', ['$event'])
