@@ -1,0 +1,154 @@
+<mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+
+<h1>Admin</h1>
+
+<mat-horizontal-stepper [linear]="true" *ngIf="!loading" #stepper>
+
+    <mat-step [stepControl]="scopeFormGroup">
+        <ng-template matStepLabel>Select event and year group</ng-template>
+
+        <form [formGroup]="scopeFormGroup">
+            <mat-form-field appearance="outline">
+                <mat-label>Year group</mat-label>
+
+                <mat-select formControlName="year" required>
+                    <mat-option *ngFor="let year of [7, 8, 9, 10]" [value]="year">
+                        Year {{ year }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Event</mat-label>
+
+                <mat-select formControlName="event" required>
+                    <mat-option *ngFor="let event of events" [value]="event.id">
+                        {{ event.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <button mat-raised-button matStepperNext color="primary" ngClass="display-block" (click)="preventEvent($event)">
+                Next
+                <mat-icon>arrow_forward</mat-icon>
+            </button>
+        </form>
+    </mat-step>
+
+    <mat-step [stepControl]="competitorFormGroup">
+        <ng-template matStepLabel>Select competitor</ng-template>
+
+        <form [formGroup]="competitorFormGroup">
+            <mat-form-field appearance="outline">
+                <mat-label>Competitor</mat-label>
+
+                <mat-select formControlName="competitor" required>
+                    <mat-option *ngFor="let competitor of getCompetitorList(scopeFormGroup.controls.event.value)"
+                                [value]="competitor" >
+                        Competitor {{ competitor }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+
+        <div class="display-block">
+            <button mat-raised-button matStepperPrevious color="accent" (click)="preventEvent($event)">
+                <mat-icon>arrow_back</mat-icon>
+                Back
+            </button>
+            <button mat-raised-button matStepperNext color="primary" (click)="loadForms($event)">
+                Next
+                <mat-icon>arrow_forward</mat-icon>
+            </button>
+        </div>
+
+    </mat-step>
+
+    <mat-step [stepControl]="authenticateFormGroup">
+        <ng-template matStepLabel>Authenticate</ng-template>
+
+        <form [formGroup]="authenticateFormGroup">
+            <mat-form-field appearance="outline">
+                <mat-label>Token</mat-label>
+
+                <input matInput placeholder="Paste token..." formControlName="token" type="text" required>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" class="display-block" (click)="saveToken($event)" matStepperNext>
+                Authenticate
+                <mat-icon>lock</mat-icon>
+            </button>
+        </form>
+    </mat-step>
+
+    <mat-step>
+        <ng-template matStepLabel>Enter scores</ng-template>
+
+        <mat-spinner *ngIf="formsLoading"></mat-spinner>
+
+        <p *ngIf="usingExistingData">
+            You're updating existing data for this event.
+        </p>
+
+        <p *ngIf="!usingExistingData">
+            You're uploading new data, as this event has no existing data.
+        </p>
+
+        <div class="mat-elevation-z8" *ngIf="!formsLoading">
+
+            <table mat-table [dataSource]="forms">
+                <ng-container matColumnDef="form">
+                    <th mat-header-cell *matHeaderCellDef>Form</th>
+
+                    <td mat-cell *matCellDef="let element">
+                        {{ element.year }}{{ element.name }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="rank">
+                    <th mat-header-cell *matHeaderCellDef>Position</th>
+
+                    <td mat-cell *matCellDef="let element">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Position</mat-label>
+
+                            <input matInput
+                                   placeholder="1-9"
+                                   type="number"
+                                   max="9"
+                                   min="1" [(ngModel)]="element.position"
+                                   (click)="$event.target.select()" required>
+                        </mat-form-field>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="points">
+                    <th mat-header-cell *matHeaderCellDef>Points</th>
+
+                    <td mat-cell *matCellDef="let element">
+                        {{ getPointAllocation(competitorFormGroup.controls.competitor.value, element.position) }}
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['form', 'rank', 'points']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['form', 'rank', 'points']"
+                    [ngClass]="'table-position-' + (row.position - 1)"></tr>
+            </table>
+
+        </div>
+
+        <div class="margin-top display-block">
+            <button matStepperPrevious mat-raised-button color="accent" (click)="preventEvent($event)">
+                <mat-icon>arrow_back</mat-icon>
+                Back
+            </button>
+
+            <button mat-raised-button color="primary" (click)="finish()">
+                Save
+                <mat-icon>check</mat-icon>
+            </button>
+        </div>
+
+    </mat-step>
+
+</mat-horizontal-stepper>
