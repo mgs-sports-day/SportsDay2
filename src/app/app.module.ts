@@ -9,11 +9,16 @@ import {RouterModule, Routes} from '@angular/router';
 import { EventDetailComponent } from './event-detail/event-detail.component';
 import {HttpClientModule} from '@angular/common/http';
 import { FormDetailComponent } from './form-detail/form-detail.component';
+import { AdminComponent } from './admin/admin.component';
+import { AboutComponent } from './about/about.component';
 
 const appRoutes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'events', component: EventDetailComponent },
-    { path: 'forms/:id', component: FormDetailComponent }
+    { path: 'forms/:id', component: FormDetailComponent },
+    { path: 'events/:id', component: EventDetailComponent },
+    { path: 'admin', component: AdminComponent },
+    { path: 'about', component: AboutComponent }
 ];
 
 @NgModule({
@@ -21,7 +26,9 @@ const appRoutes: Routes = [
         AppComponent,
         HomeComponent,
         EventDetailComponent,
-        FormDetailComponent
+        FormDetailComponent,
+        AdminComponent,
+        AboutComponent
     ],
     imports: [
         BrowserModule,

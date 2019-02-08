@@ -1,15 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-    MatButtonModule,
-    MatIconModule,
-    MatListModule, MatPaginatorModule, MatRippleModule,
-    MatSidenavModule,
+    MatButtonModule, MatChipsModule, MatDividerModule, MatFormFieldModule,
+    MatIconModule, MatInputModule,
+    MatListModule, MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatRippleModule, MatSelectModule,
+    MatSidenavModule, MatSnackBarModule, MatSortModule, MatStepperModule,
     MatTableModule,
     MatTabsModule,
     MatToolbarModule
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
     declarations: [],
@@ -24,7 +25,16 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
         MatTabsModule,
         MatTableModule,
         MatRippleModule,
-        MatPaginatorModule
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatProgressBarModule,
+        MatStepperModule,
+        MatInputModule,
+        MatSelectModule,
+        FormsModule,
+        MatSnackBarModule,
+        ReactiveFormsModule,
+        MatDividerModule
     ],
     exports: [
         BrowserAnimationsModule,
@@ -36,7 +46,16 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
         MatTabsModule,
         MatTableModule,
         MatRippleModule,
-        MatPaginatorModule
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatProgressBarModule,
+        MatStepperModule,
+        MatInputModule,
+        MatSelectModule,
+        FormsModule,
+        MatSnackBarModule,
+        ReactiveFormsModule,
+        MatDividerModule
     ]
 })
 export class MaterialImportsModule { }

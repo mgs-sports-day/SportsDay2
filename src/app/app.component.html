@@ -18,9 +18,18 @@
     <mat-sidenav-content>
 
         <mat-toolbar color="primary" class="nav">
-            <span>MGS Sports Day</span>
+            <a routerLink="/" class="no-link">
+                <div>
+                    <img src="../assets/mgs_white_logo.svg" alt="White MGS logo">
+                    <span class="nav-text">Sports Day 2019</span>
+                </div>
+            </a>
 
             <span class="nav-filler"></span>
+
+            <button mat-icon-button *ngIf="mobile" (click)="sidenav.toggle()">
+                <mat-icon>menu</mat-icon>
+            </button>
 
             <div *ngIf="!mobile">
 
@@ -29,16 +38,13 @@
                 </a>
 
             </div>
-
-            <button mat-icon-button *ngIf="mobile" (click)="sidenav.toggle()">
-                <mat-icon>
-                    menu
-                </mat-icon>
-            </button>
         </mat-toolbar>
 
         <div class="main-container">
             <router-outlet></router-outlet>
+
+            <mat-divider></mat-divider>
+            <p class="footer-text">This website is part of a family of co-curricular sites run by students and staff of the Manchester Grammar School. The main school website is at <a href="https://mgs.org" target="_blank" class="no-link-dark">mgs.org.</a></p>
         </div>
 
     </mat-sidenav-content>

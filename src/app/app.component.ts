@@ -21,6 +21,10 @@ export class AppComponent implements OnInit {
             {
                 name: 'Home',
                 path: '/'
+            },
+            {
+                name: 'About',
+                path: '/about'
             }
         ];
 

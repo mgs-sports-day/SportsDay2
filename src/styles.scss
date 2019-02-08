@@ -1,6 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
+// themes
+@import '~@angular/material/theming';
+@include mat-core();
+
+$mgs-app-primary: mat-palette($mat-blue);
+$mgs-app-accent: mat-palette($mat-cyan);
+
+$mgs-app-theme: mat-light-theme($mgs-app-primary, $mgs-app-accent);
+
+@include angular-material-theme($mgs-app-theme);
 
 html, body {
     margin: 0;
@@ -9,6 +19,89 @@ html, body {
 
 *, ::after, ::before {
     box-sizing: border-box;
+}
+
+.no-link {
+    color: white;
+    text-decoration: none;
+}
+
+.no-link-dark {
+    color: unset;
+    text-decoration: none;
+
+    &:hover{
+        text-decoration: underline;
+    }
+}
+
+.mat-elevation-z8 {
+    overflow: auto;
+
+    .mat-cell {
+        min-width: 100px;
+        width: min-content;
+        width: -moz-min-content;
+    }
+}
+
+.margin-top {
+    margin-top: 15px !important;
+}
+
+.special-padding-tab .mat-tab-body-content {
+    padding: 0 !important;
+
+    .special-padding-content {
+        padding: 15px;
+    }
+}
+
+mat-form-field:not(:first-child) {
+    margin-left: 15px;
+}
+
+table {
+    mat-form-field {
+        padding-top: 10px;
+    }
+}
+
+.footer-text {
+    color: gray;
+    text-align: center;
+}
+
+mat-toolbar {
+    .no-link {
+        height: 100%;
+        width: auto;
+
+        display: flex;
+        align-items: center;
+
+        div {
+            max-height: min-content;
+
+            img {
+                width: 80px;
+                vertical-align: middle;
+                margin-right: 10px;
+            }
+        }
+    }
+}
+
+.display-block {
+    display: block !important;
+
+    button + button {
+        margin-left: 10px;
+    }
+}
+
+.mat-horizontal-content-container {
+    padding-top: 10px !important;
 }
 
 .nav-filler {
@@ -48,6 +141,10 @@ td {
     outline: none !important;
 }
 
+tr {
+    transition: background-color 200ms ease;
+}
+
 .table-position-0 {
     background-color: #ffdf74;
 }
@@ -58,4 +155,18 @@ td {
 
 .table-position-2 {
     background-color: #d0a361;
+}
+
+.breakdown-table {
+    .padding-left {
+        padding-left: 20px;
+    }
+
+    .rank-cell {
+        padding-left: 10px;
+
+        &+.mat-cell {
+            padding-left: 10px;
+        }
+    }
 }

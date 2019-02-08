@@ -13,24 +13,29 @@ export class HomeComponent implements OnInit {
 
     events: Event[];
     forms: Form[];
+    loading: boolean;
 
-    constructor(private eventDetailService: EventDetailService, private formDetailService: FormDetailService) { }
+    constructor(private eventDetailService: EventDetailService, private formDetailService: FormDetailService) {
+        this.loading = true;
+    }
 
     ngOnInit() {
 
         this.eventDetailService.getEvents()
-            .subscribe((data: [Event]) => {
-                this.events = [...data];
-            });
+            .subscribe((events: [Event]) => {
+                this.events = [...events];
 
-        this.formDetailService.getForms()
-            .subscribe((data: [Form]) => {
+                this.formDetailService.getForms()
+                    .subscribe((forms: [Form]) => {
 
-                this.forms = [...data];
+                        this.forms = [...forms];
 
-                this.forms = this.forms.sort((a, b) => {
-                    return b.total_points - a.total_points;
-                });
+                        this.forms = this.forms.sort((a, b) => {
+                            return b.total_points - a.total_points;
+                        });
+
+                        this.loading = false;
+                    });
             });
     }
 
