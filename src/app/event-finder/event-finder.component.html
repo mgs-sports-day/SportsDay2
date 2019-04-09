@@ -1,0 +1,92 @@
+<h1>Event Finder</h1>
+
+<p>You can use this tool to find information about an event you're participating in. Simply enter your year group, event, and competitor (A, B or C) to get the following information about your event:</p>
+
+<ul>
+    <li>Location</li>
+    <li>Start time</li>
+    <li>2018 MGS record for your year</li>
+    <li>World record</li>
+</ul>
+
+<mat-vertical-stepper [linear]="true" #eventStepper>
+    <mat-step [stepControl]="yearGroupFormGroup">
+        <ng-template matStepLabel>Select year group and event</ng-template>
+
+        <form [formGroup]="yearGroupFormGroup">
+            <mat-form-field appearance="outline">
+                <mat-label>Year group</mat-label>
+
+                <mat-select formControlName="yearGroup" required>
+                    <mat-option *ngFor="let year of [7, 8, 9, 10]" [value]="year">
+                        Year {{ year }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Event</mat-label>
+
+                <mat-select formControlName="event" required>
+                    <mat-option *ngFor="let event of events" [value]="event.id">
+                        {{ event.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+
+        <button mat-raised-button color="primary" class="display-block" matStepperNext>
+            Next
+            <mat-icon>arrow_forward</mat-icon>
+        </button>
+    </mat-step>
+
+    <mat-step [stepControl]="competitorFormGroup">
+        <ng-template matStepLabel>Select competitor</ng-template>
+
+        <form [formGroup]="competitorFormGroup">
+            <mat-form-field appearance="outline">
+                <mat-label>Competitor</mat-label>
+
+                <mat-select formControlName="competitor" required>
+                    <mat-option *ngFor="let competitor of getCompetitorList(yearGroupFormGroup.controls.event.value)" [value]="competitor">
+                        Competitor {{ competitor }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+
+        <button mat-raised-button color="primary" class="display-block" matStepperNext (click)="finish()">
+            Next
+            <mat-icon>arrow_forward</mat-icon>
+        </button>
+    </mat-step>
+
+    <mat-step>
+        <ng-template matStepLabel>Time and location</ng-template>
+
+        <mat-spinner *ngIf="!allocation"></mat-spinner>
+
+        <div *ngIf="allocation">
+            <p>
+                You need to be at the <strong>{{ allocation.location }}</strong>
+                at least 5 minutes before <strong>{{ allocation.starts_at | date: 'shortTime' }}</strong>
+            </p>
+
+            <p>
+                The year {{ yearGroupFormGroup.controls.yearGroup.value }} record to beat is <strong>{{ recordToBeat.score }} {{ recordToBeat.units }}s</strong>
+                set by <strong>{{ recordToBeat.holder }}</strong> in 2018.
+            </p>
+
+            <p>
+                The world record for {{ getEvent().name }} is <strong>{{ getEvent().world_record }}</strong>,
+                held by <strong>{{ getEvent().world_record_holder }}</strong>.
+            </p>
+
+            <button mat-raised-button color="primary" (click)="reset()">
+                Check another event
+            </button>
+        </div>
+
+    </mat-step>
+</mat-vertical-stepper>

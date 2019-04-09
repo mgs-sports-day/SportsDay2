@@ -35,6 +35,16 @@ html, body {
     }
 }
 
+.no-link-blue {
+    color: #007bff;
+    text-decoration: none;
+
+    &:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+}
+
 .mat-elevation-z8 {
     overflow: auto;
 
@@ -157,7 +167,20 @@ tr {
     background-color: #d0a361;
 }
 
-.breakdown-table {
+.table-highlight {
+    background-color: #9dffaa;
+}
+
+.table-subtext {
+    display: block;
+    font-weight: bold;
+}
+
+.mute {
+    color: #808080;
+}
+
+.breakdown-table, .mat-table {
     .padding-left {
         padding-left: 20px;
     }
@@ -169,4 +192,11 @@ tr {
             padding-left: 10px;
         }
     }
+}
+
+.inline-spinner {
+    display: inline-block !important;
+    margin-top: 0 !important;
+    vertical-align: middle;
+    margin-left: 5px;
 }

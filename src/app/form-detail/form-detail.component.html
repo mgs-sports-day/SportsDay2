@@ -3,6 +3,19 @@
 <div *ngIf="!loading">
     <h1>
         {{ form.year }}{{ form.name }}
+
+        <mat-menu #switcher="matMenu">
+            <a mat-menu-item *ngFor="let form of forms" [routerLink]="'/forms/' + form.id" [ngClass]="'table-position-' + (form.rank - 1)">
+                <strong>{{ form.year }}{{ form.name }}</strong>
+                | {{ form.total_points }} points
+                | {{ form.rank }}{{ nth(form.rank) }} place
+            </a>
+        </mat-menu>
+
+        <button mat-stroked-button [matMenuTriggerFor]="switcher">
+            Switch form
+            <mat-icon>arrow_drop_down</mat-icon>
+        </button>
     </h1>
 
     <mat-tab-group>
@@ -28,7 +41,7 @@
 
                     <tr mat-row
                         *matRowDef="let row; columns: ['name', 'value']"
-                        [ngClass]="row.name !== 'Total points' ? ('table-position-' + ( row.value - 1)) : ''"></tr>
+                        [ngClass]="row.name !== 'Total points' && row.name !== 'Records broken' ? ('table-position-' + ( row.value - 1)) : ''"></tr>
                 </table>
             </div>
 
@@ -71,26 +84,72 @@
                             </td>
 
                             <td class="mat-cell rank-cell" [ngClass]="'table-position-' + (event.A.rank - 1)">
-                                {{ event.A.rank }}
+                                {{ event.A.rank || '' }}
                             </td>
-                            <td class="mat-cell">{{ event.A.score || 0 }}</td>
+                            <td class="mat-cell">{{ event.A.score || '' }}</td>
 
                             <td class="mat-cell rank-cell" [ngClass]="'table-position-' + (event.B.rank - 1)">
-                                {{ event.B.rank }}
+                                {{ event.B.rank || '' }}
                             </td>
-                            <td class="mat-cell">{{ event.B.score || 0 }}</td>
+                            <td class="mat-cell">{{ event.B.score || '' }}</td>
 
                             <td class="mat-cell rank-cell" [ngClass]="'table-position-' + (event.C.rank - 1)">
-                                {{ event.C.rank }}
+                                {{ event.C.rank || '' }}
                             </td>
-                            <td class="mat-cell">{{ event.C.score || 0 }}</td>
+                            <td class="mat-cell">{{ event.C.score || '' }}</td>
 
-                            <td class="mat-cell">{{ event.total }}</td>
+                            <td class="mat-cell">{{ event.total || '' }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
+        </mat-tab>
+
+        <mat-tab *ngIf="form.records.length > 0" label="Records">
+            <table mat-table [dataSource]="recordsBreakdown" class="mat-elevation-z8">
+
+                <ng-container matColumnDef="event">
+                    <th mat-header-cell *matHeaderCellDef> Event </th>
+                    <td mat-cell *matCellDef="let element">
+                        <a class="no-link-dark" [routerLink]="'/events/' + element.id">
+                            {{ element.name }}
+                        </a>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="pastRecord">
+                    <th mat-header-cell *matHeaderCellDef> 2018 record (year {{ form.year }}) </th>
+                    <td mat-cell *matCellDef="let element" class="rank-cell">
+                        {{ safeAccessObject(element.past_record, 'score', 0) }}
+                        {{ safeAccessObject(element.past_record, 'units', '', 's') }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="currentRecord">
+                    <th mat-header-cell *matHeaderCellDef> 2019 record (this form) </th>
+                    <td mat-cell
+                        *matCellDef="let element"
+                        [ngClass]="{ 'table-highlight': safeCompareObject(element) }"
+                        class="rank-cell" >
+
+                        {{ safeAccessObject(element.form_record, 'score', 0) }}
+                        {{ safeAccessObject(element.form_record, 'units', '', 's') }}
+
+                        <span *ngIf="safeCompareObject(element)">
+                            by {{ safeAccessObject(element.form_record, 'holder', '') }}
+                        </span>
+
+                        <span *ngIf="safeCompareObject(element)" class="table-subtext">
+                            Record broken!
+                        </span>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['event', 'pastRecord', 'currentRecord']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['event', 'pastRecord', 'currentRecord']"></tr>
+
+            </table>
         </mat-tab>
     </mat-tab-group>
 </div>

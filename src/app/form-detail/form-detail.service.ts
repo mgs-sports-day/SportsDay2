@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import { Event } from '../event-detail/event-detail.service';
+import { Event, Record } from '../event-detail/event-detail.service';
 
 export interface Form {
     id?: number;
@@ -8,12 +8,18 @@ export interface Form {
     year: number;
     scores?: Score[];
     total_points?: number;
+    records?: Record[];
     rank?: number;
     year_rank?: number;
 
     // pseudo-attributes
     position?: number;
     score_id?: number;
+    score_number?: number;
+
+    equals_record?: boolean;
+    beats_record?: boolean;
+    record_holder?: string;
 }
 
 export interface Score {
@@ -30,6 +36,10 @@ export interface Score {
     event?: Event;
     form?: Form;
     rank?: number;
+
+    beats_record?: boolean;
+    record_value?: number;
+    record_holder?: string;
 }
 
 @Injectable({

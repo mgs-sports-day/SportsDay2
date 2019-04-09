@@ -7,7 +7,7 @@
 
         <mat-nav-list>
             <mat-list-item *ngFor="let item of navigation">
-                <a matLine [routerLink]="item.path">
+                <a matLine [routerLink]="item.path" (click)="sidenav.toggle()">
                     {{ item.name }}
                 </a>
             </mat-list-item>
@@ -41,6 +41,23 @@
         </mat-toolbar>
 
         <div class="main-container">
+            <mat-card style="text-align: center; margin-bottom: 10px;" matTooltip="Data is automatically reloaded every 120 seconds on some pages, to keep the website up to date with live changes.">
+                <div *ngIf="reloadEnabled">
+                    Data reloading in <strong>{{ reloadTime }} seconds</strong>
+
+                    <mat-progress-spinner
+                        mode="determinate"
+                        [value]="(reloadTime / defaultReloadTime) * 100"
+                        diameter="16"
+                        style="margin-top: 10px;"
+                        class="inline-spinner"></mat-progress-spinner>
+                </div>
+
+                <div *ngIf="!reloadEnabled">
+                    Auto-reloading paused on this page
+                </div>
+            </mat-card>
+
             <router-outlet></router-outlet>
 
             <mat-divider></mat-divider>

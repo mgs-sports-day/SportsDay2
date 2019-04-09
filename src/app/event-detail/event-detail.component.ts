@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {Event, EventDetailService} from './event-detail.service';
-import {ActivatedRoute} from '@angular/router';
+import {Event, EventDetailService, Record} from './event-detail.service';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Score} from '../form-detail/form-detail.service';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
     selector: 'app-event-detail',
@@ -10,13 +11,18 @@ import {Score} from '../form-detail/form-detail.service';
 })
 export class EventDetailComponent implements OnInit {
 
-    constructor(private eventDetailService: EventDetailService, private activatedRoute: ActivatedRoute) {
+    constructor(private eventDetailService: EventDetailService,
+                private activatedRoute: ActivatedRoute,
+                private snackBar: MatSnackBar,
+                private router: Router) {
         this.loading = true;
         this.scoreBreakdown = { 7: {}, 8: {}, 9: {}, 10: {} };
     }
 
     event: Event;
+    events: Event[];
     scoreBreakdown: { 7: {}, 8: {}, 9: {}, 10: {} };
+    records: object;
     loading: boolean;
 
     static numberToLetter(n) {
@@ -63,7 +69,42 @@ export class EventDetailComponent implements OnInit {
                         }
                     }
 
+                    this.records = {
+                        7: {
+                            2018: {}, 2019: {}
+                        },
+                        8: {
+                            2018: {}, 2019: {}
+                        },
+                        9: {
+                            2018: {}, 2019: {}
+                        },
+                        10: {
+                            2018: {}, 2019: {}
+                        },
+                    };
+
+                    this.event.records.forEach((record: Record) => {
+                        if (record.current_record) {
+                            this.records[record.form.year]['2019'] = record;
+                        } else {
+                            this.records[record.past_year_group]['2018'] = record;
+                        }
+                    });
+
                     console.log(this.scoreBreakdown);
+                    console.log(this.records);
+
+                    this.eventDetailService.getEvents()
+                        .subscribe((events: Event[]) => {
+                            events.splice(events
+                                .map(e => e.id)
+                                .indexOf(
+                                    parseInt(params.get('id'), 10)
+                                ), 1);
+
+                            this.events = events;
+                        });
                 });
         });
     }
@@ -77,6 +118,15 @@ export class EventDetailComponent implements OnInit {
         }
 
         return array;
+    }
+
+    isEmptyObject(object: object) {
+        for (const key in object) {
+            if (object.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {EventDetailService, Event} from '../event-detail/event-detail.service';
+import {EventDetailService, Event, Record} from '../event-detail/event-detail.service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Form, FormDetailService, Score} from '../form-detail/form-detail.service';
 import {AdminService} from './admin.service';
 import {MatSnackBar} from '@angular/material';
 import {HttpErrorResponse} from '@angular/common/http';
+import * as moment from 'moment';
 
 @Component({
     selector: 'app-admin',
@@ -12,18 +13,6 @@ import {HttpErrorResponse} from '@angular/common/http';
     styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
-
-    forms: Form[];
-    events: Event[];
-    scopeFormGroup: FormGroup;
-    competitorFormGroup: FormGroup;
-    authenticateFormGroup: FormGroup;
-
-    loading: boolean;
-    formsLoading: boolean;
-    usingExistingData: boolean;
-
-    pointAllocations: object;
 
     constructor(private eventDetailService: EventDetailService,
                 private formDetailService: FormDetailService,
@@ -39,12 +28,55 @@ export class AdminComponent implements OnInit {
         };
     }
 
+    forms: Form[];
+    events: Event[];
+    selectedEvent: Event;
+    scopeFormGroup: FormGroup;
+    competitorFormGroup: FormGroup;
+    authenticateFormGroup: FormGroup;
+
+    loading: boolean;
+    formsLoading: boolean;
+    usingExistingData: boolean;
+
+    pointAllocations: object;
+
+    recordBeaten: boolean;
+    recordHasNoHolder: boolean;
+    currentRecord: Record;
+    existingRecord: Record;
+    oldRecord: Record;
+
+    time: string;
+
     static numberToLetter(n) {
         const letters = ['A', 'B', 'C'];
         return letters[n];
     }
 
+    static isEmptyObject(object: object) {
+        for (const key in object) {
+            if (object.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    testRecordBeaten(currentScore, oldScore) {
+        if ([1, 2, 3, 4].includes(this.selectedEvent.id)) {
+            return currentScore > oldScore;
+        } else if ([5, 6, 7, 8, 9, 10, 11].includes(this.selectedEvent.id)) {
+            return currentScore < oldScore;
+        }
+    }
+
     ngOnInit() {
+        this.time = moment().format('LTS');
+        window.setInterval(() => {
+            this.time = moment().format('LTS');
+        }, 1000);
+
         this.eventDetailService.getEvents()
             .subscribe((events: [Event]) => {
                 this.events = [...events];
@@ -88,33 +120,106 @@ export class AdminComponent implements OnInit {
                 this.eventDetailService.getEvent(this.scopeFormGroup.controls.event.value)
                     .subscribe((event: Event) => {
 
-                        const thisEventScores: Score[] = event.scores.filter((e: Score) => {
-                            return (
-                                e.form.year === this.scopeFormGroup.controls.year.value &&
-                                e.competitor === this.competitorFormGroup.controls.competitor.value
-                            );
-                        });
+                        this.selectedEvent = event;
 
-                        this.usingExistingData = thisEventScores.length !== 0;
+                        this.getRecord(() => {
+                            if (this.currentRecord) {
+                                if (this.competitorFormGroup.controls.competitor.value === this.currentRecord.competitor) {
+                                    const recordForm = this.forms.find((e: Form) => {
+                                        return e.id === this.currentRecord.form.id;
+                                    });
 
-                        if (thisEventScores.length !== 0) {
-                            this.forms.forEach((form: Form) => {
-                                const score: Score = thisEventScores.find(e => {
-                                    return e.form.id === form.id;
+                                    this.forms[this.forms.indexOf(recordForm)].record_holder = this.currentRecord.holder;
+                                    this.forms[this.forms.indexOf(recordForm)].score_number = this.currentRecord.score;
+                                    this.forms[this.forms.indexOf(recordForm)].beats_record = true;
+                                    this.recordBeaten = true;
+                                    this.existingRecord = this.currentRecord;
+                                }
+                            } else {
+                                this.forms.forEach((form: Form) => {
+                                    form.score_number = 0;
+                                    form.record_holder = '';
                                 });
+                            }
 
-                                form.position = score.rank || 8;
-                                form.score_id = score.id;
+                            const thisEventScores: Score[] = event.scores.filter((e: Score) => {
+                                return (
+                                    e.form.year === this.scopeFormGroup.controls.year.value &&
+                                    e.competitor === this.competitorFormGroup.controls.competitor.value
+                                );
                             });
-                        } else {
-                            this.forms.forEach((form: Form) => {
-                                form.position = 8;
-                            });
-                        }
 
-                        this.formsLoading = false;
+                            this.usingExistingData = thisEventScores.length !== 0;
+
+                            if (thisEventScores.length !== 0) {
+                                this.forms.forEach((form: Form) => {
+                                    const score: Score = thisEventScores.find(e => {
+                                        return e.form.id === form.id;
+                                    });
+
+                                    form.position = score.rank || 8;
+                                    form.score_id = score.id;
+                                });
+                            } else {
+                                this.forms.forEach((form: Form) => {
+                                    form.position = 8;
+                                });
+                            }
+
+                            this.formsLoading = false;
+                        });
                     });
             });
+    }
+
+    testRecord(form: Form) {
+        if (this.recordsAllowed()) {
+            this.adminService.getRecord(this.scopeFormGroup.controls.year.value, this.selectedEvent.id)
+                .subscribe((record: Record) => {
+                    if (record) {
+                        if ((record.units === 'metre' && form.score_number > record.score) ||
+                            (record.units === 'second' && form.score_number < record.score)) {
+                            form.equals_record = false;
+                            form.beats_record = true;
+                            this.recordBeaten = true;
+                        } else if (form.score_number === record.score) {
+                            form.equals_record = true;
+                            form.beats_record = false;
+                            this.recordBeaten = false;
+                        } else {
+                            form.equals_record = false;
+                            form.beats_record = false;
+                            this.recordBeaten = false;
+                        }
+
+                        this.oldRecord = record;
+                    } else {
+                        form.equals_record = false;
+                        form.beats_record = true;
+                        this.recordBeaten = true;
+                    }
+
+                    this.recordHasNoHolder = [10, 11].includes(this.selectedEvent.id);
+                });
+        }
+    }
+
+    getRecord(callback: () => void) {
+        this.adminService.getCurrentRecord(this.scopeFormGroup.controls.year.value, this.selectedEvent.id)
+            .subscribe((record: Record) => {
+                if (record) {
+                    this.currentRecord = record;
+                }
+
+                callback();
+            });
+    }
+
+    updatePosition(element: Form) {
+        element.equals_record = false;
+        element.beats_record = false;
+        this.recordBeaten = false;
+        element.score_number = 0;
     }
 
     finish() {
@@ -124,7 +229,7 @@ export class AdminComponent implements OnInit {
             const newScore: Score = {
                 event_id: this.scopeFormGroup.controls.event.value,
                 form_id: form.id,
-                points: this.getPointAllocation(this.competitorFormGroup.controls.competitor.value, form.position),
+                points: this.getPointAllocation(this.competitorFormGroup.controls.competitor.value, form),
                 competitor: this.competitorFormGroup.controls.competitor.value,
                 id: null
             };
@@ -138,10 +243,46 @@ export class AdminComponent implements OnInit {
 
         this.adminService.saveScores(scoresArray, this.authenticateFormGroup.controls.token.value)
             .subscribe(() => {
-                this.snackBar.open('Scores saved successfully!', 'Start again')
-                    .afterDismissed().subscribe(() => {
-                        window.location.reload();
+                const completeCycle = () => {
+                    this.snackBar.open('Scores saved successfully!', 'Start again')
+                        .afterDismissed().subscribe(() => {
+                            window.location.reload();
+                    });
+                };
+
+                const scoreForm = this.forms.find((e: Form) => {
+                    return e.score_number > 0;
                 });
+
+                if (scoreForm) {
+                    if (this.testRecordBeaten(scoreForm.score_number, this.oldRecord.score)) {
+                        console.log('sending create record request');
+                        this.adminService.updateRecord(
+                            scoreForm,
+                            this.selectedEvent,
+                            this.competitorFormGroup.controls.competitor.value,
+                            this.authenticateFormGroup.controls.token.value)
+                            .subscribe(() => {
+                                completeCycle();
+                            });
+
+                    } else if (!this.testRecordBeaten(scoreForm.score_number, this.oldRecord.score)) {
+                        console.log('sending delete record request');
+                        this.adminService.deleteRecord(
+                            scoreForm.year,
+                            this.selectedEvent,
+                            this.authenticateFormGroup.controls.token.value
+                        )
+                            .subscribe(() => {
+                                completeCycle();
+                            });
+                    } else {
+                        completeCycle();
+                    }
+                } else {
+                    completeCycle();
+                }
+
             }, (error: HttpErrorResponse) => {
                 let errorMessage;
 
@@ -171,8 +312,28 @@ export class AdminComponent implements OnInit {
         }
     }
 
-    getPointAllocation(competitor, position) {
-        return this.pointAllocations[competitor][position - 1];
+    getPointAllocation(competitor, element) {
+        let addition = 0;
+
+        if (element.beats_record) {
+            addition = 2;
+        } else if (element.equals_record) {
+            addition = 1;
+        }
+
+        return this.pointAllocations[competitor][element.position - 1] + addition;
+    }
+
+    getSelectedEventName() {
+        if (!this.selectedEvent) {
+            return '';
+        } else {
+            return this.selectedEvent.name;
+        }
+    }
+
+    recordsAllowed() {
+        return this.competitorFormGroup.controls.competitor.value === 'A';
     }
 
 }

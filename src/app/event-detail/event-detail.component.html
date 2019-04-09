@@ -1,10 +1,31 @@
 <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
 
 <div *ngIf="!loading">
-    <h1>{{ event.name }}</h1>
+    <h1>
+        {{ event.name }}
+
+        <mat-menu #switcher="matMenu">
+            <a mat-menu-item *ngFor="let event of events" [routerLink]="'/events/' + event.id">
+                {{ event.name }}
+            </a>
+        </mat-menu>
+
+        <button mat-stroked-button [matMenuTriggerFor]="switcher">
+            Switch event
+            <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+    </h1>
 
     <mat-tab-group ngClass="special-padding-tab">
-        <mat-tab *ngFor="let year of [7, 8, 9, 10]" [label]="'Year ' + year">
+        <mat-tab *ngFor="let year of [7, 8, 9, 10]">
+
+            <ng-template mat-tab-label>
+                Year {{ year }}
+
+                <strong *ngIf="!isEmptyObject(records[year]['2019'])" style="margin-left: 5px;">
+                    Record!
+                </strong>
+            </ng-template>
 
             <mat-tab-group selectedIndex="0">
                 <mat-tab *ngFor="let competitor of subEventArray(event.competitors)" [label]="'Competitor ' + competitor">
@@ -61,6 +82,88 @@
 
                 </mat-tab>
             </mat-tab-group>
+
+            <mat-divider></mat-divider>
+
+            <h1>Record data</h1>
+
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            2018
+                        </mat-panel-title>
+
+                        <mat-panel-description>
+                            <span *ngIf="isEmptyObject(records[year]['2018'])">
+                                No record data
+                            </span>
+
+                            <span *ngIf="!isEmptyObject(records[year]['2018'])">
+                                {{ records[year]['2018'].score }} {{ records[year]['2018'].units }}s
+                            </span>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+
+                    <p *ngIf="!isEmptyObject(records[year]['2018'])">
+                        {{ records[year]['2018'].score }} {{ records[year]['2018'].units }} record set
+
+                        <span *ngIf="records[year]['2018'].holder">
+                            by
+                            {{ records[year]['2018'].holder }}
+                        </span>
+                        in 2018.
+                    </p>
+
+                    <p *ngIf="isEmptyObject(records[year]['2018'])">
+                        No record data has been found for this event in 2018.
+                    </p>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            2019
+                        </mat-panel-title>
+
+                        <mat-panel-description>
+                            <span *ngIf="!isEmptyObject(records[year]['2019'])">
+                                {{ records[year]['2019'].score }} {{ records[year]['2019'].units }}s
+                            </span>
+
+                            <span *ngIf="isEmptyObject(records[year]['2019'])">
+                                2018 record not broken
+                            </span>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+
+                    <p *ngIf="isEmptyObject(records[year]['2019'])">
+                        Only broken records are displayed, and the 2018 record has not been broken.
+                    </p>
+
+                    <p *ngIf="!isEmptyObject(records[year]['2019'])">
+                        {{ records[year]['2019'].score }} {{ records[year]['2019'].units }} record set
+
+                        <span *ngIf="records[year]['2019'].holder">
+                            by
+                            {{ records[year]['2019'].holder }}
+                        </span>
+
+                        in 2019, breaking
+
+                        <span *ngIf="records[year]['2018'].holder">
+                            {{ records[year]['2018'].holder }}'s
+                        </span>
+
+                        <span *ngIf="!records[year]['2018'].holder">
+                            the
+                        </span>
+
+                        {{ records[year]['2018'].score }} {{ records[year]['2018'].units }} record set in 2018.
+                    </p>
+
+                </mat-expansion-panel>
+            </mat-accordion>
 
         </mat-tab>
     </mat-tab-group>

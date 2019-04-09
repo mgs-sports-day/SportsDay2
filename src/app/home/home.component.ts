@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
                         this.forms = [...forms];
 
                         this.forms = this.forms.sort((a, b) => {
-                            return b.total_points - a.total_points;
+                            return a.rank - b.rank;
                         });
 
                         this.loading = false;

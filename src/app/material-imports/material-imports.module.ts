@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-    MatButtonModule, MatChipsModule, MatDividerModule, MatFormFieldModule,
+    MatBadgeModule,
+    MatButtonModule, MatCardModule, MatChipsModule, MatDividerModule, MatExpansionModule, MatFormFieldModule,
     MatIconModule, MatInputModule,
-    MatListModule, MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatRippleModule, MatSelectModule,
+    MatListModule, MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatRippleModule, MatSelectModule,
     MatSidenavModule, MatSnackBarModule, MatSortModule, MatStepperModule,
     MatTableModule,
     MatTabsModule,
-    MatToolbarModule
+    MatToolbarModule, MatTooltipModule
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -34,7 +35,14 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
         FormsModule,
         MatSnackBarModule,
         ReactiveFormsModule,
-        MatDividerModule
+        MatDividerModule,
+        MatExpansionModule,
+        MatCardModule,
+        MatMenuModule,
+        MatTooltipModule,
+        MatChipsModule,
+        MatBadgeModule,
+        MatSortModule
     ],
     exports: [
         BrowserAnimationsModule,
@@ -55,7 +63,14 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
         FormsModule,
         MatSnackBarModule,
         ReactiveFormsModule,
-        MatDividerModule
+        MatDividerModule,
+        MatExpansionModule,
+        MatCardModule,
+        MatMenuModule,
+        MatTooltipModule,
+        MatChipsModule,
+        MatBadgeModule,
+        MatSortModule
     ]
 })
 export class MaterialImportsModule { }
