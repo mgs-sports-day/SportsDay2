@@ -144,9 +144,12 @@ export class FormDetailComponent implements OnInit {
 
     safeCompareObject(object) {
         if (object.form_record && object.past_record) {
-            if (object.form_record.score > object.past_record.score) {
-                return true;
+            if (object.score_units === 'metre') {
+                return object.form_record.score > object.past_record.score;
+            } else {
+                return object.form_record < object.past_record.score;
             }
+
         } else {
             return false;
         }
