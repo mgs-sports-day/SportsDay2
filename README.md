@@ -1,3 +1,9 @@
+This project is no longer maintained, and should not be used.
+
+Future Sports Days will be handled by the MyMGS App.
+
+---
+
 # SportsDay2
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.0.
